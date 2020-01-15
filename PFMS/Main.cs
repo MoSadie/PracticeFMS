@@ -52,7 +52,7 @@ namespace PFMS
 
         static void generateGameString()
         {
-            List<string[]> gameStrings = new ArrayList<string[]>();
+            List<string[]> gameStrings = new List<string[]>();
             string[] colorStrings = new string[4] {"R", "G", "B", "Y"};
             foreach(string colorRed in colorStrings) {
                 foreach(string colorBlue in colorStrings) {
