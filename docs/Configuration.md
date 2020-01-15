@@ -14,9 +14,9 @@ The amount of time, in seconds, between the Autonomous period ending and the Tel
 ## GameStringOverride
 See the table below for choosing a value:
 
-| -1 | 0 | 1 | 2 | 3 |
-|---|---|---|---|---|
-| Override disabled, randomly chosen | Red: `RLR` Blue: `RLR` | Red: `LRL` Blue: `LRL` | Red: `RRR` Blue: `LLL` | Red: `LLL` Blue: `RRR` |
+| -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Override disabled, randomly chosen | Red: "R" Blue: "R" | Red: "R" Blue: "G" | Red: "R" Blue: "B" | Red: "R" Blue: "Y" | Red: "G" Blue: "R" | Red: "G" Blue: "G" | Red: "G" Blue: "B" | Red: "G" Blue: "Y" | Red: "B" Blue: "R" | Red: "B" Blue: "G" | Red: "B" Blue: "B" | Red: "B" Blue: "Y" | Red: "Y" Blue: "R" | Red: "Y" Blue: "G" | Red: "Y" Blue: "B" | Red: "Y" Blue: "Y" |
 
 ## RedAllianceCount
 The number of robots on the red alliance.

@@ -13,7 +13,7 @@ namespace PFMS
 {
     class Arena
     {
-        public const string version = "2018.1.1.0"; //Syntax: Year.Major.Minor.Revision
+        public const string version = "2020.1.0.0"; //Syntax: Year.Major.Minor.Revision
 
         static string[] defaultOptions = new string[] {
             "AutonomousTime:15",
@@ -41,23 +41,27 @@ namespace PFMS
 
         public static int TimeLeftInPhase = 0;
 
-        //For the 2018 season, there are two different game strings sent, one for the Red alliance, and one for the Blue alliance.
+        //For the 2020 season, there are two different game strings sent, one for the Red alliance, and one for the Blue alliance.
         public static string redGameString;
         public static string blueGameString;
+        // Also, they are not sent before/during the match, they are sent mid match.
+        public static Boolean useGeneratedGameString = false;
 
         //This will place the config file in the same directory as PFMS.exe
         static string configPath = "config.txt";
 
         static void generateGameString()
         {
-            Dictionary<int, string[]> gameStrings = new Dictionary<int, string[]>();
-            gameStrings.Add(0, new string[2] { "RLR", "RLR" });
-            gameStrings.Add(1, new string[2] { "LRL", "LRL" });
-            gameStrings.Add(2, new string[2] { "RRR", "LLL" });
-            gameStrings.Add(3, new string[2] { "LLL", "RRR" });
+            List<string[]> gameStrings = new ArrayList<string[]>();
+            string[] colorStrings = new string[4] {"R", "G", "B", "Y"};
+            foreach(string colorRed in colorStrings) {
+                foreach(string colorBlue in colorStrings) {
+                    gameStrings.Add(new string[2] { colorRed, colorBlue });
+                }
+            }
 
-            int selection = new Random().Next(0, 4);
-            if (options["GameStringOverride"] != -1 && options["GameStringOverride"] < 4 && options["GameStringOverride"] >= 0) selection = options["GameStringOverride"];
+            int selection = new Random().Next(0, gameStrings.Count);
+            if (options["GameStringOverride"] != -1 && options["GameStringOverride"] < gameStrings.Count && options["GameStringOverride"] >= 0) selection = options["GameStringOverride"];
 
             redGameString = gameStrings[selection][0];
             blueGameString = gameStrings[selection][1];
@@ -80,6 +84,9 @@ namespace PFMS
             {
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Enter) estop = true;
+                else if (keyInfo.Key == ConsoleKey.Spacebar) {
+                    useGeneratedGameString = true;
+                }
                 else if (estopDsDict.ContainsKey(keyInfo.Key))
                 {
                     estopDsDict[keyInfo.Key].estop = true;
@@ -92,7 +99,7 @@ namespace PFMS
             //Welcome Message
             Console.Clear();
             Console.WriteLine("Welcome to the unoffical practice FMS Version {0}", version);
-            Console.WriteLine("Written by MoSadie for FRC Team 4450, the Olympia Robotics Federation.");
+            Console.WriteLine("Written by Sean for FRC Team 4450, the Olympia Robotics Federation.");
             Console.WriteLine("Robots are dangerous. Please be safe.");
 
             //Config Setup
@@ -147,6 +154,7 @@ namespace PFMS
             generateGameString();
             Console.WriteLine("Game String for Red: " + redGameString);
             Console.WriteLine("Game String for Blue: " + blueGameString);
+            Console.WriteLine("Initially, Game String will be an empty string, press Space during match to transmit the generated game strings");
             Console.WriteLine();
             Console.WriteLine("Press Enter to start connecting Driver Stations.");
             Console.ReadLine();
@@ -222,6 +230,7 @@ namespace PFMS
                 foreach (DriverStation ds in redAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -229,6 +238,7 @@ namespace PFMS
                 foreach (DriverStation ds in blueAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -251,6 +261,7 @@ namespace PFMS
                 foreach (DriverStation ds in redAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -258,6 +269,7 @@ namespace PFMS
                 foreach (DriverStation ds in blueAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -275,12 +287,16 @@ namespace PFMS
                 Console.WriteLine(teamsParticipatingString);
                 Console.WriteLine("{0} seconds remain in Teleoperated.", TimeLeftInPhase);
                 Console.WriteLine("Game Strings: Red: {0} Blue: {1}", redGameString, blueGameString);
+                if (!useGeneratedGameString) {
+                    Console.WriteLine("Press Space to send game strings to teams.");
+                }
                 Console.WriteLine();
                 Console.WriteLine("Press Enter to EStop the match.");
 
                 foreach (DriverStation ds in redAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -288,6 +304,7 @@ namespace PFMS
                 foreach (DriverStation ds in blueAlliance)
                 {
                     if (ds.TeamNumber == 0) continue;
+                    ds.sendGameStringPacket();
                     if (!ds.estop) Console.WriteLine("Press {0} to EStop team {1}", ds.estopKey, ds.TeamNumber);
                     else Console.WriteLine("Team {0} has been estopped.", ds.TeamNumber);
                 }
@@ -304,7 +321,7 @@ namespace PFMS
             Console.WriteLine("Cleaning up.");
             foreach (DriverStation ds in redAlliance) ds.dispose();
             foreach (DriverStation ds in blueAlliance) ds.dispose();
-            Console.WriteLine("All done! Thank you for using the PFMS by MoSadie.");
+            Console.WriteLine("All done!");
             Console.WriteLine("To start another match, just restart this program.");
             Console.WriteLine();
             Console.WriteLine("Press any key to exit...");

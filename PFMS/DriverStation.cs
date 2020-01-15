@@ -203,7 +203,8 @@ namespace PFMS
         public byte[] generateGameStringPacket()
         {
             string gameString = "";
-            if (allianceStation == AllianceStations.RED1 || allianceStation == AllianceStations.RED2 || allianceStation == AllianceStations.RED3) gameString = Arena.redGameString;
+            if (!Arena.useGeneratedGameString) gameString = "";
+            else if (allianceStation == AllianceStations.RED1 || allianceStation == AllianceStations.RED2 || allianceStation == AllianceStations.RED3) gameString = Arena.redGameString;
             else if (allianceStation == AllianceStations.BLUE1 || allianceStation == AllianceStations.BLUE2 || allianceStation == AllianceStations.BLUE3) gameString = Arena.blueGameString;
 
             byte[] stringBuffer = System.Text.Encoding.ASCII.GetBytes(gameString);
